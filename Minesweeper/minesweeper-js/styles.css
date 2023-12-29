@@ -43,22 +43,22 @@ body {
   user-select: none;
 }
 
-.board > [data-val="hidden"] {
+.board > [data-status="hidden"] {
   background-color: #bbb;
   cursor: pointer;
 }
 
-.board > [data-val="mine"] {
+.board > [data-status="mine"] {
   background-color: red;
   cursor: pointer;
 }
 
-.board > [data-val="number"] {
+.board > [data-status="number"] {
   background-color: none;
   cursor: pointer;
 }
 
-.board > [data-val="marked"] {
+.board > [data-status="marked"] {
   background-color: yellow;
   cursor: pointer;
 }

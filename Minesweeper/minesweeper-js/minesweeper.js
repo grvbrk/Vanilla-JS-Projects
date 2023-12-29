@@ -1,4 +1,4 @@
-const TILE_STATUSES = {
+export const TILE_STATUSES = {
   HIDDEN: "hidden",
   MINE: "mine",
   NUMBER: "number",
@@ -13,17 +13,17 @@ export function createBoard(boardSize, numberOfMines) {
     const row = [];
     for (let y = 0; y < boardSize; y++) {
       const element = document.createElement("div");
-      element.dataset.val = TILE_STATUSES.HIDDEN;
+      element.dataset.status = TILE_STATUSES.HIDDEN;
       const tile = {
         element,
         x,
         y,
         mine: minePositions.some((p) => isPositionMatch(p, { x, y })),
-        get val() {
-          return this.element.dataset.val;
+        get status() {
+          return this.element.dataset.status;
         },
-        set val(value) {
-          this.element.dataset.val = value;
+        set status(value) {
+          this.element.dataset.status = value;
         },
       };
       row.push(tile);
@@ -40,8 +40,33 @@ export function markTile(tile) {
   //   ) {
   //     return;
   //   }
-  if (tile.val === TILE_STATUSES.MARKED) tile.val = TILE_STATUSES.HIDDEN;
-  else tile.val = TILE_STATUSES.MARKED;
+  if (tile.status === TILE_STATUSES.MARKED) tile.status = TILE_STATUSES.HIDDEN;
+  else tile.status = TILE_STATUSES.MARKED;
+}
+
+export function revealTile(board, tile) {
+  if (tile.status !== TILE_STATUSES.HIDDEN) return;
+  if (tile.mine) {
+    tile.status = TILE_STATUSES.MINE;
+    return;
+  }
+  tile.status = TILE_STATUSES.NUMBER;
+  const adjacentTiles = nearbyTiles(board, tile);
+  const mines = adjacentTiles.filter((tile) => tile.mine);
+  if (mines.length != 0) {
+    tile.element.textContent = mines.length;
+  }
+}
+
+function nearbyTiles(board, { x, y }) {
+  const tiles = [];
+  for (let xOffset = -1; xOffset <= 1; xOffset++) {
+    for (let yOffset = -1; yOffset <= 1; yOffset++) {
+      const tile = board[x + xOffset]?.[y + yOffset];
+      if (tile) tiles.push(tile);
+    }
+  }
+  return tiles;
 }
 
 function getMinePositions(boardSize, numberOfMines) {
