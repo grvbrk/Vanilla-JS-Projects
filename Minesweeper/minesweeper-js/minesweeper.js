@@ -20,9 +20,11 @@ export function createBoard(boardSize, numberOfMines) {
         y,
         mine: minePositions.some((p) => isPositionMatch(p, { x, y })),
         get status() {
+          // tile.status
           return this.element.dataset.status;
         },
         set status(value) {
+          //tile.status === TILE_STATUSES.xyz
           this.element.dataset.status = value;
         },
       };
@@ -40,11 +42,14 @@ export function markTile(tile) {
   //   ) {
   //     return;
   //   }
+
+  // If marked => Hidden, if Hidden => Marked
   if (tile.status === TILE_STATUSES.MARKED) tile.status = TILE_STATUSES.HIDDEN;
   else tile.status = TILE_STATUSES.MARKED;
 }
 
 export function revealTile(board, tile) {
+  // Any tile which is not "Hidden" (Marked, Mine or Number) will prematurely return
   if (tile.status !== TILE_STATUSES.HIDDEN) return;
   if (tile.mine) {
     tile.status = TILE_STATUSES.MINE;
@@ -56,6 +61,34 @@ export function revealTile(board, tile) {
   if (mines.length != 0) {
     tile.element.textContent = mines.length;
   }
+  if (mines.length === 0) {
+    adjacentTiles.forEach((tile) => revealTile(board, tile));
+  }
+}
+
+export function checkWin(board) {
+  //Check if every single hidden or marked tile is a mine
+  const hiddenTiles = [];
+  board.forEach((row) => {
+    row.forEach((tile) => {
+      if (
+        tile.status === TILE_STATUSES.HIDDEN ||
+        tile.status === TILE_STATUSES.MARKED
+      ) {
+        hiddenTiles.push(tile);
+      }
+    });
+  });
+  return hiddenTiles.every((tile) => tile.mine);
+}
+
+export function checkLose(board) {
+  //Check if even one tile has it's status set as mine
+  return board.some((row) => {
+    return row.some((tile) => {
+      return tile.status === TILE_STATUSES.MINE;
+    });
+  });
 }
 
 function nearbyTiles(board, { x, y }) {
