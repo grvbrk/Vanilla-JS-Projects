@@ -10,5 +10,12 @@ module.exports = class FileSystem {
     });
   }
 
-  static write() {}
+  static write(path, value) {
+    return new Promise((resolve, reject) => {
+      fs.writeFile(path, value.toString(), "utf-8", (err) => {
+        if (err) reject(err);
+        resolve();
+      });
+    });
+  }
 };

@@ -10,6 +10,7 @@ module.exports = class Account {
   #name;
   #balance;
 
+  //We make getter function for private properties
   get name() {
     return this.#name;
   }
@@ -20,6 +21,25 @@ module.exports = class Account {
 
   get filePath() {
     return `accounts/${this.#name}.txt`;
+  }
+
+  deposit(amount) {
+    const newBalance = this.#balance + Number(amount);
+    FileSystem.write(this.filePath, newBalance);
+    this.#balance = newBalance;
+  }
+
+  async withdraw(amount) {
+    const newBalance = this.#balance - Number(amount);
+    return new Promise((resolve, reject) => {
+      if (newBalance < 0) {
+        reject("Not enough balance");
+      } else {
+        FileSystem.write(this.filePath, newBalance);
+        this.#balance = newBalance;
+        resolve();
+      }
+    });
   }
 
   async #load() {
@@ -42,5 +62,15 @@ module.exports = class Account {
 
   static async create(accountName) {
     const account = new Account(accountName);
+
+    //We do not load this account since there's no file.
+    // Hence we create a file/account
+    try {
+      await FileSystem.write(account.filePath, 0);
+      account.#balance = 0;
+      return account;
+    } catch (error) {
+      return null;
+    }
   }
 };
