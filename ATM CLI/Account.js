@@ -29,6 +29,8 @@ module.exports = class Account {
     this.#balance = newBalance;
   }
 
+  //Not a static method
+  //Can be invoked by instances of class Account
   async withdraw(amount) {
     const newBalance = this.#balance - Number(amount);
     return new Promise((resolve, reject) => {
